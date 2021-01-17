@@ -12,13 +12,19 @@ import webbrowser
 # KEYBOARD & MOUSE INPUT 
 import keyboard as kb
 import pyautogui as pag
+import os
 
 # SCREENSHOT INPUT
 import pyscreenshot as scr
 import base64
 import io
 
+# CSV MANIPULATION | DROPBASE
+import csv
+import threading
+
 ADDRESS = 'http://rentogether.azurewebsites.net/'
+DROPBASE = 'https://api2.dropbase.io/v1'
 
 import platform
 WINDOWS = platform.system() == 'Windows'
@@ -28,6 +34,10 @@ class MainApplication(tk.Frame):
         super().__init__(master)
         self.master = master
         self.master.protocol('WM_DELETE_WINDOW', self.close_callback)
+        self.is_admin = os.getuid() == 0
+        if not WINDOWS and not self.is_admin:
+            mbox.showerror('Error', 'Application must be run as admin in Mac OS')
+            self.destroy()
         self._row = 0
         self.grid()
         self.construct()
@@ -88,6 +98,34 @@ class MainApplication(tk.Frame):
             mbox.showerror('Error', 'Something went wrong')
         self.game_code.set('None')
 
+        # Send CSV to WebServer
+        with open('data.csv', 'rb') as f:
+            resp = requests.post(ADDRESS + 'upload', files={'file': f})
+
+        if not resp.ok:
+            mbox.showerror('Error', 'Could not Upload File')
+            return
+        
+        file_url = ADDRESS[:-1] + resp.json()['url']
+
+        # Pipe to Dropbase
+        resp = requests.post(DROPBASE + '/pipeline/run_pipeline', params={
+            'token': 'Y2kcBGj9bNwLyjR84giR32',
+            'fileUrl': file_url,
+        })
+
+        if not resp.ok:
+            mbox.showerror('Error', 'Dropbase unreachable')
+            return
+
+        job_id = resp.text.strip().replace('"', '')
+        resp = requests.get(DROPBASE + '/pipeline/run_pipeline', params={'job_id': job_id})
+        
+        if not resp.ok:
+            mbox.showerror('Error', 'Pipeline not processing')
+            return
+
+        # File will be processed now
 
     def event_callback(self):
         if self.window.get() not in gw.getAllTitles():
@@ -116,27 +154,45 @@ class MainApplication(tk.Frame):
 
         coordinates = []
         # Add coordinates on click
-        self.block_canvas = tk.Canvas(self.block, width=w, height=h)
-
         def click_callback():
             nonlocal coordinates
             pos = pag.position()
             x, y = pos.x - x1, pos.y - y1
             coordinates.append({'x': x, 'y': y})
 
+        def csv_result():
+            # Read Results
+            results = requests.post(ADDRESS + 'results/' + self.game_code.get()).json()
+            event_data = results['event']
+            choices = []
+            for key in results:
+                if key != 'event':
+                    choices.append(key + ';' + str(results[key]))
+            choices = ' '.join(choices)
+            
+            with open('data.csv', 'w', newline='') as f:
+                field_names = ['image', 'timeout', 'choices']
+                writer = csv.DictWriter(f, fieldnames=field_names)
+                writer.writeheader()
+                writer.writerow({
+                    'image': event_data['image'],
+                    'timeout': event_data['timeout'],
+                    'choices': choices
+                })
+
         def submit():
             resp = requests.post(ADDRESS + 'event/' + self.game_code.get(), json={'choices': coordinates, 'image': image, 'timeout': self.timeout.get()})
             kb.remove_hotkey(self.submit_thread)
             kb.remove_hotkey(self.click_thread)
+            # Start Looking for Results
+            self.fetch_result_thread.start()
             if resp.status_code != 200:
                 mbox.showerror('Error', 'Server could not be reached')
                 return
-            
-            # Load top level with information
 
-        self.block_canvas.grid()
         self.submit_thread = kb.add_hotkey(self.submit_hotkey.get(), submit)
         self.click_thread = kb.add_hotkey(self.click_hotkey.get(), click_callback)
+        self.fetch_result_thread = threading.Timer(self.timeout.get() + 1, csv_result)
         
 
 
@@ -175,12 +231,16 @@ class MainApplication(tk.Frame):
         self.config_popup = tk.Toplevel(self)
 
         def close_config():
-            for hkey in [self.event_hotkey, self.quit_hotkey, self.click_hotkey, self.submit_hotkey, self.timeout]:
+            try:
+                x = self.timeout.get()
+                if not x or x <= 0:
+                    raise ValueError
+            except:
+                mbox.showerror('Error', 'Ensure that Timeout is a Number above 0')
+                return
+            for hkey in [self.event_hotkey, self.quit_hotkey, self.click_hotkey, self.submit_hotkey]:
                 hotkey = hkey.get()
                 try:
-                    if type(hotkey) == 'int':
-                        if hotkey <= 0:
-                            raise ValueError
                     if not hotkey:
                         raise ValueError
                     kb.parse_hotkey(hotkey)

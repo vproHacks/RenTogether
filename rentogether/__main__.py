@@ -1,4 +1,5 @@
-from rentogether.app import MainApplication
+#from rentogether.app import MainApplication
+from app import MainApplication
 import tkinter
 
 def main():
