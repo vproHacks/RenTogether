@@ -5,8 +5,8 @@ with open('README.md', 'r') as readme:
     long_description = readme.read()
 
 setuptools.setup(
-    name="RenTogether-vproHacks",
-    version='0.0.1',
+    name="RenTogether",
+    version='0.0.2',
     author='Vraj Prajapati',
     author_email='vrajip@gmail.com',
     description='A Utility that Allows everyone to play VNs Together!',
@@ -14,7 +14,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/vproHacks/RenTogether',
     packages=['rentogether'],
-    install_requires=['pygetwindow', 'requests', 'keyboard', 'pyscreenshot', 'pyautogui'],
+    install_requires=['pygetwindow', 'requests', 'keyboard', 'pyscreenshot', 'pyautogui', 'PIL'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
