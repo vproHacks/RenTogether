@@ -97,7 +97,7 @@ class MainApplication(tk.Frame):
         if WINDOWS:
             win = gw.getWindowsWithTitle(self.window.get())[0]
             w, h, x, y = win.width, win.height, win.left, win.top
-            self.geometry.set(self.to_tk_geo(x, y, w, h))
+            self.geometry.set(self.to_tk_geo([x, y, w, h]))
 
         # Get Screenshot
         (w, h), x1, y1 = map(lambda s: map(int, s.split('x')) if 'x' in s else int(s), self.geometry.get().split('+'))
