@@ -19,6 +19,9 @@ import io
 
 ADDRESS = 'http://rentogether.azurewebsites.net/'
 
+import platform
+WINDOWS = platform.system() == 'Windows'
+
 class MainApplication(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -89,7 +92,12 @@ class MainApplication(tk.Frame):
         if self.window.get() not in gw.getAllTitles():
             mbox.showerror('Error', 'Window title has changed! Unable to track it.')
             return
-        self.geometry.set(self.to_tk_geo(gw.getWindowGeometry(self.window.get())))
+        if not WINDOWS:
+            self.geometry.set(self.to_tk_geo(gw.getWindowGeometry(self.window.get())))
+        if WINDOWS:
+            win = gw.getWindowsWithTitle(self.window.get())[0]
+            w, h, x, y = win.width, win.height, win.left, win.top
+            self.geometry.set(self.to_tk_geo(x, y, w, h))
 
         # Get Screenshot
         (w, h), x1, y1 = map(lambda s: map(int, s.split('x')) if 'x' in s else int(s), self.geometry.get().split('+'))
