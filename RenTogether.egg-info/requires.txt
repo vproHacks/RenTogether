@@ -3,4 +3,4 @@ requests
 keyboard
 pyscreenshot
 pyautogui
-PIL
+pillow

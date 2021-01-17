@@ -14,7 +14,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/vproHacks/RenTogether',
     packages=['rentogether'],
-    install_requires=['pygetwindow', 'requests', 'keyboard', 'pyscreenshot', 'pyautogui', 'PIL'],
+    install_requires=['pygetwindow', 'requests', 'keyboard', 'pyscreenshot', 'pyautogui', 'pillow'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
