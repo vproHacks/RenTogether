@@ -13,8 +13,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/vproHacks/RenTogether',
-    packages=['src'],
-    install_requires=['pygetwindow', 'flask', 'keyboard'],
+    packages=['rentogether'],
+    install_requires=['pygetwindow', 'requests', 'keyboard', 'pyscreenshot', 'pyautogui'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -22,7 +22,7 @@ setuptools.setup(
     ],
     entry_points = {
         'console_scripts': [
-            'rentogether=src.__main__:main',
+            'rentogether=rentogether.__main__:main',
         ],
     },
     python_requires='>=3.6'
