@@ -6,7 +6,7 @@ with open('README.md', 'r') as readme:
 
 setuptools.setup(
     name="RenTogether",
-    version='0.0.7',
+    version='0.1.0',
     author='Vraj Prajapati',
     author_email='vrajip@gmail.com',
     description='A Utility that Allows everyone to play VNs Together!',
