@@ -25,7 +25,7 @@ sudo python3 -m rentogether
 
 And it should run the application for you. You will see a window pop up that looks something like this:
 
-![application](./images/open.png)
+![application](https://i.imgur.com/WvsiqCN.png)
 
 # Usage
 
@@ -68,6 +68,12 @@ I thought it'd be a fun project to code up! It's something I can see myself usin
 
 ## How did you make it?
 Woah you're actually taking an interest in something I made!?
+
+Short Answer:
+
+![tooMuchPython](https://i.imgur.com/W56ysLX.png)
+
+Long Answer:
 
 The webserver was made using Flask and SocketIO. It was my first time using SocketIO so that was a real blast!
 
