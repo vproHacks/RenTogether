@@ -122,7 +122,6 @@ class MainApplication(tk.Frame):
             pos = pag.position()
             x, y = pos.x - x1, pos.y - y1
             coordinates.append({'x': x, 'y': y})
-            print(x, y)
 
         def submit():
             resp = requests.post(ADDRESS + 'event/' + self.game_code.get(), json={'choices': coordinates, 'image': image, 'timeout': self.timeout.get()})

@@ -1,3 +1,0 @@
-[console_scripts]
-rentogether = rentogether.__main__:main
-

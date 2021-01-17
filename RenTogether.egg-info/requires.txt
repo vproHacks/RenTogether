@@ -1,6 +1,0 @@
-pygetwindow
-requests
-keyboard
-pyscreenshot
-pyautogui
-pillow
