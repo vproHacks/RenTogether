@@ -7,6 +7,7 @@ import pygetwindow as gw
 
 # REQUESTS IMPORT
 import requests
+import webbrowser
 
 # KEYBOARD & MOUSE INPUT 
 import keyboard as kb
@@ -58,10 +59,10 @@ class MainApplication(tk.Frame):
 
 
         # CONFIG VARIABLES
-        self.event_hotkey = tk.StringVar(self, 'f6')
-        self.click_hotkey = tk.StringVar(self, 'f4')
-        self.quit_hotkey = tk.StringVar(self, 'f2')
-        self.submit_hotkey = tk.StringVar(self, 'f5')
+        self.event_hotkey = tk.StringVar(self, 'f10')
+        self.click_hotkey = tk.StringVar(self, 'f9')
+        self.quit_hotkey = tk.StringVar(self, 'f6')
+        self.submit_hotkey = tk.StringVar(self, 'f8')
         self.timeout = tk.IntVar(self, 15)
         
     def close_callback(self):
@@ -173,16 +174,35 @@ class MainApplication(tk.Frame):
     def config_window(self):
         self.config_popup = tk.Toplevel(self)
 
+        def close_config():
+            for hkey in [self.event_hotkey, self.quit_hotkey, self.click_hotkey, self.submit_hotkey, self.timeout]:
+                hotkey = hkey.get()
+                try:
+                    if type(hotkey) == 'int':
+                        if hotkey <= 0:
+                            raise ValueError
+                    if not hotkey:
+                        raise ValueError
+                    kb.parse_hotkey(hotkey)
+                except:
+                    mbox.showerror('Error', 'Ensure that Hotkey Values Are Valid!!')
+                    return
+                
+                self.config_popup.destroy()
+
+        self.config_popup.protocol('WM_DELETE_WINDOW', close_config)
+        config = self.config_popup
+
+        tk.Label(config, text='Event Hotkey:').grid(row=1, column=1)
+        tk.Entry(config, textvariable=self.event_hotkey).grid(row=1, column=2)
+        tk.Label(config, text='Click Hotkey:').grid(row=2, column=1)
+        tk.Entry(config, textvariable=self.click_hotkey).grid(row=2, column=2)
+        tk.Label(config, text='Quit Hotkey:').grid(row=3, column=1)
+        tk.Entry(config, textvariable=self.quit_hotkey).grid(row=3, column=2)
+        tk.Label(config, text='Submit Hotkey:').grid(row=4, column=1)
+        tk.Entry(config, textvariable=self.submit_hotkey).grid(row=4, column=2)
+        tk.Label(config, text='Timeout:').grid(row=5, column=1)
+        tk.Entry(config, textvariable=self.timeout).grid(row=5, column=2)
+
     def help_window(self):
-        self.help_popup = tk.Toplevel(self)        
-        help = self.help_popup
-
-        # Row Utility
-        _row = 0
-        def row(_p=0):
-            nonlocal _row
-            if not _p:
-                _row += 1
-            return _row
-
-        # Add Content Below as needed
+        webbrowser.open_new('https://github.com/vproHacks/RenTogether/blob/master/README.md')
